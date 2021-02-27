@@ -1,9 +1,9 @@
 ::[Bat To Exe Converter]
 ::
-::fBE1pAF6MU+EWHreyHcjLQlHcDevBVeeA6YX/Ofr0+mCsFlQWeMxeYjeyIinLvMH60noSrUM6nlfit8BCwkWewquDg==
-::fBE1pAF6MU+EWHreyHcjLQlHcDevBVeeA6YX/Ofr0+mCsFlQWeMxeYjeyIinLvMH60noSrUM6kl3oYY+IzRsMzGKIAwmvQ4=
+::fBE1pAF6MU+EWHreyHcjLQlHcDevBVeeCaIS5Of66/m7kEISQMEeRIzeyKCbNOkfpED8cPY=
+::fBE1pAF6MU+EWHreyHcjLQlHcDevBVeeCaIS5Of66/m7kEISQMEeRLz24/m8D88np2bFO5U/who=
 ::YAwzoRdxOk+EWAjk
-::fBw5plQjdCyDJGyX8VAjFCh5dTimM3y0Crod7PvH7v7Wo0VQDe47dtaWiuTbbukQ5SU=
+::fBw5plQjdCyDJGyX8VAjFCh5dTimM3y0Crod7PvH3eWItm48aOMzdIqIl7CPdecKpxW0JNgk1XU6
 ::YAwzuBVtJxjWCl3EqQJgSA==
 ::ZR4luwNxJguZRRnk
 ::Yhs/ulQjdF65
@@ -28,7 +28,7 @@
 ::ZQ0/vhVqMQ3MEVWAtB9wSA==
 ::Zg8zqx1/OA3MEVWAtB9wSA==
 ::dhA7pRFwIByZRRnk
-::Zh4grVQjdCyDJGyX8VAjFCh5dTimOXixEroM1Pr+urnT7EgFUYI=
+::Zh4grVQjdCyDJGyX8VAjFCh5dTimM3y0Crod7PvH/e/S8RlTUfo6GA==
 ::YB416Ek+ZW8=
 ::
 ::
@@ -42,7 +42,7 @@ echo 按任意键将SMY ROOT CA证书导入计算机
 pause >nul
 
 
-certmgr.exe -add SMY-ROOT-CA.crt -all -s -r localMachine trustedpublisher
-certmgr.exe -add SMY-ROOT-CA.crt -all -s -r localMachine AuthRoot
+certutil.exe -addstore "Root" SMY-ROOT-CA.crt >nul
+
 echo 导入成功！
 pause
