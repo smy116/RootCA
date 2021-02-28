@@ -23,4 +23,5 @@ Direct Download:
 
 SHA1:143DBB72594BCB725E5B70E0F243F6A28D218F06
 
+Lorem ipsum dolor sit amet.
 [button url="http://www.google.com"]
