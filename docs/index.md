@@ -1,7 +1,3 @@
-
-
-## Welcome to Install SMY Root CA
-
 ### Windows
 
 Download:
