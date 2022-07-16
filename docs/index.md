@@ -18,3 +18,18 @@ Direct Download:
 **[SMY-ROOT-CA.crt](https://github.com/smy116/RootCA/releases/download/2.0/SMY-ROOT-CA.crt)** 
 
 SHA1:143DBB72594BCB725E5B70E0F243F6A28D218F06
+
+## VPS init script
+
+
+####  via curl to install script
+
+```bash
+curl -O https://raw.githubusercontent.com/smy116/RootCA/main/init.sh && chmod +x ./init.sh && ./init.sh
+```
+
+#### via wget to install script
+
+```bash
+wget --no-check-certificate https://raw.githubusercontent.com/smy116/RootCA/main/init.sh && chmod +x ./init.sh && ./init.sh
+```
