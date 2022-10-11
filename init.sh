@@ -34,9 +34,10 @@ function  start_menu(){
     echo
     green " 1. 设置北京时区"
     green " 2. 配置SSH及Root账户"
-    green " 3. 运行Trojan Trojan-go V2ray Xray 一键安装脚本"
-    green " 4. 运行LNMP-键安装包 V1.9"
-    green " 5. 运行ACME Shell script: acme.sh"
+    green " 3. 运行Linux内核 BBR Cloudflare WARP安装脚本"
+    green " 4. 运行Trojan Trojan-go V2ray Xray 一键安装脚本"
+    green " 5. 运行LNMP-键安装包 V1.9"
+    green " 6. 运行ACME Shell script: acme.sh"
     green " 9. 重启系统"
     green " 0. 退出脚本"
 
@@ -77,14 +78,18 @@ function  start_menu(){
         ;;
 
         3 )
-            wget --no-check-certificate https://raw.githubusercontent.com/jinwyp/one_click_script/master/trojan_v2ray_install.sh && chmod +x ./trojan_v2ray_install.sh && ./trojan_v2ray_install.sh
+           wget --no-check-certificate https://raw.githubusercontent.com/jinwyp/one_click_script/master/install_kernel.sh && chmod +x ./install_kernel.sh && ./install_kernel.sh
         ;;
 
         4 )
-            wget http://soft.vpser.net/lnmp/lnmp1.9.tar.gz -cO lnmp1.9.tar.gz && tar zxf lnmp1.9.tar.gz && cd lnmp1.9 && ./install.sh lnmp
+            wget --no-check-certificate https://raw.githubusercontent.com/jinwyp/one_click_script/master/trojan_v2ray_install.sh && chmod +x ./trojan_v2ray_install.sh && ./trojan_v2ray_install.sh
         ;;
 
         5 )
+            wget http://soft.vpser.net/lnmp/lnmp1.9.tar.gz -cO lnmp1.9.tar.gz && tar zxf lnmp1.9.tar.gz && cd lnmp1.9 && ./install.sh lnmp
+        ;;
+
+        6 )
             wget -O -  https://get.acme.sh | sh -s email=i@smy.me
         ;;
 
