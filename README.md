@@ -27,9 +27,17 @@ SHA1:143DBB72594BCB725E5B70E0F243F6A28D218F06
 ```bash
 curl -O https://raw.githubusercontent.com/smy116/RootCA/main/init.sh && chmod +x ./init.sh && ./init.sh
 ```
+#####  use CDN
+```bash
+curl -O https://cdn.jsdelivr.net/gh/smy116/RootCA@main/init.sh && chmod +x ./init.sh && ./init.sh
+```
 
 #### via wget to install script
 
 ```bash
 wget --no-check-certificate https://raw.githubusercontent.com/smy116/RootCA/main/init.sh && chmod +x ./init.sh && ./init.sh
+```
+#####  use CDN
+```bash
+wget --no-check-certificate https://cdn.jsdelivr.net/gh/smy116/RootCA@main/init.sh && chmod +x ./init.sh && ./init.sh
 ```
