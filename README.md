@@ -3,21 +3,26 @@
 Download:
 **[Install-To-Windows.exe](https://github.com/smy116/RootCA/releases/download/2.0/Install-To-Windows.exe)**
 
-SHA1:4C92CEAC9903C456B35D1867FF085E71C6D4DEBB
+SHA1:2622624D5A95F8AA62E6EA9B3585BB536B848145
 
 ### Linux
 
 Download:
 **[Install-To-Linux.zip](https://github.com/smy116/RootCA/releases/download/2.0/Install-To-Linux.zip)**
 
-SHA1:D0158EC174C10158BCBDA79AC02813157C1835CD
+SHA1:82DE00412C4CFEEFB4A3B749CB3F75A4BFCCA251
 
 ### Root Cert 
 
-Direct Download:
-**[SMY-ROOT-CA.crt](https://github.com/smy116/RootCA/releases/download/2.0/SMY-ROOT-CA.crt)** 
+RSA Cert:
+**[SMY-Root-CA-RSA.crt](https://github.com/smy116/RootCA/releases/download/2.0/SMY-Root-CA-RSA.crt)** 
 
-SHA1:143DBB72594BCB725E5B70E0F243F6A28D218F06
+SHA1:75FC84ABD78F155AF3030D19735C9826ADD1A9B0
+
+ECC Cert:
+**[SMY-Root-CA-ECC.crt](https://github.com/smy116/RootCA/releases/download/2.0/SMY-Root-CA-ECC.crt)** 
+
+SHA1:87C2991C8409C88A4956D54FB4AF3F955233F797
 
 ## VPS init script
 
