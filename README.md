@@ -8,7 +8,7 @@ SHA1:2622624D5A95F8AA62E6EA9B3585BB536B848145
 ### Linux
 
 Download:
-**[Install-To-Linux.zip](https://github.com/smy116/RootCA/releases/download/2.0/Install-To-Linux.zip)**
+**[Install-To-Linux.sh](https://github.com/smy116/RootCA/releases/download/2.0/Install-To-Linux.sh)**
 
 SHA1:82DE00412C4CFEEFB4A3B749CB3F75A4BFCCA251
 
