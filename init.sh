@@ -204,26 +204,13 @@ function setLinuxRootLogin(){
     ${sudoCmd} passwd root
     green "修改root密码为成功！"
 
-
-
-    if [ "$osRelease" == "centos" ] || [ "$osRelease" == "debian" ] ; then
-        ${sudoCmd} sed -i 's/#\?PermitRootLogin \(yes\|no\|Yes\|No\|prohibit-password\)/PermitRootLogin yes/g' /etc/ssh/sshd_config
-    fi
-    if [ "$osRelease" == "ubuntu" ]; then
-        ${sudoCmd} sed -i 's/#\?PermitRootLogin prohibit-password/PermitRootLogin yes/g' /etc/ssh/sshd_config
-    fi
     green "设置允许root登陆成功!"
 
-
-    if [ "$osRelease" == "centos" ] ; then
-
-        ${sudoCmd} service sshd restart
-        ${sudoCmd} systemctl restart sshd
-
-    else
-        ${sudoCmd} service ssh restart
-        ${sudoCmd} systemctl restart ssh
-     
+    # 重启SSH服务
+    if command -v systemctl &>/dev/null; then
+        systemctl restart sshd
+    elif command -v service &>/dev/null; then
+        service ssh restart
     fi
 
     green "设置成功, 请用SSH工具软件登陆服务器!"
