@@ -191,10 +191,6 @@ function  start_menu(){
                     ;;
             esac
 
-            # Start and enable Nginx service
-            echo "Starting Nginx..."
-            sudo systemctl start nginx
-            sudo systemctl enable nginx
             if [[ $isContinueInput == [Yy] ]]; then
             isContinueInput=${isContinueInput:-Y}
                 start_menu
