@@ -155,7 +155,7 @@ function  start_menu(){
         ;;
 
         5 )
-            bash <(curl -Lso- https://cdn.jsdelivr.net/gh/jinwyp/one_click_script@master/install_kernel.sh)
+            curl -O https://cdn.jsdelivr.net/gh/jinwyp/one_click_script@master/install_kernel.sh && chmod +x ./install_kernel.sh && ./install_kernel.sh
         ;;
 
         6 )
