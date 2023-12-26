@@ -133,6 +133,7 @@ function  start_menu(){
         #3. 安装 SMY Root Certification Authority
             installCA
             read -p "是否返回主菜单? 直接回车默认返回主菜单, 请输入[Y/n]:" isContinueInput
+            isContinueInput=${isContinueInput:-Y}
 
             if [[ $isContinueInput == [Yy] ]]; then
                 start_menu
@@ -187,6 +188,7 @@ function  start_menu(){
             sudo systemctl start nginx
             sudo systemctl enable nginx
             if [[ $isContinueInput == [Yy] ]]; then
+            isContinueInput=${isContinueInput:-Y}
                 start_menu
             else 
                 exit 0
