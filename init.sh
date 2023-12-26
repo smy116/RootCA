@@ -181,7 +181,17 @@ function setPublicKey(){
     fi
 
     ${sudoCmd} echo "$publicKey" > /root/.ssh/authorized_keys
-    green "写入SSH公钥成功!"
+    chmod 700 /root/.ssh
+    chmod 600 /root/.ssh/authorized_keys
+
+    # 确保sshd_config文件存在
+    if [ -f /etc/ssh/sshd_config ]; then
+        # 禁用SSH密码认证
+        sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+        sed -i 's/^PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+    fi
+    
+    green "禁用SSH密码认证，并写入SSH公钥成功!"
     
 }
 
