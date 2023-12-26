@@ -44,22 +44,22 @@ Shortcut:
 ###  via curl to install script
 
 ```bash
-bash -c "$(curl -s -L https://ca.smy.life/init)"
+bash -c "$(curl -s -L https://ca.smy.life/init.sh)"
 ```
 
 #### Shortcut
 Install Root CA:
 ```bash
-bash -c "$(curl -s -L https://ca.smy.life/init)" -- ca
+bash -c "$(curl -s -L https://ca.smy.life/init.sh)" -- ca
 ```
 
 Install SSH Key and Change root password:
 ```bash
-bash -c "$(curl -s -L https://ca.smy.life/init)" -- root $password
+bash -c "$(curl -s -L https://ca.smy.life/init.sh)" -- root $password
 ```
 
 ### via wget to install script
 
 ```bash
-bash -c "$(wget -q -O - https://ca.smy.life/init)"
+bash -c "$(wget -q -O - https://ca.smy.life/init.sh)"
 ```
