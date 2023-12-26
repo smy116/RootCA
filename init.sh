@@ -150,12 +150,12 @@ function  start_menu(){
                 sleep 2s
                 start_menu
             fi
-            curl -L https://raw.githubusercontent.com/naiba/nezha/master/script/install.sh -o nezha.sh && chmod +x nezha.sh && sudo CN=true ./nezha.sh install_agent status-api.smy.me 443 $nezhaAgentKey --tls --disable-command-execute
+            curl -L https://cdn.jsdelivr.net/gh/naiba/nezha@master/script/install.sh -o nezha.sh && chmod +x nezha.sh && sudo CN=true ./nezha.sh install_agent status-api.smy.me 443 $nezhaAgentKey --tls --disable-command-execute
 
         ;;
 
         5 )
-            bash -c "$(curl -s -L https://raw.githubusercontent.com/jinwyp/one_click_script/master/install_kernel.sh)"
+            bash -c "$(curl -s -L https://cdn.jsdelivr.net/gh/jinwyp/one_click_script@master/install_kernel.sh)"
         ;;
 
         6 )
