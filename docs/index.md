@@ -1,18 +1,20 @@
-### Windows
+## SMY Root Certification Authority
+
+### Windows install script
 
 Download:
 **[Install-To-Windows.exe](https://github.com/smy116/RootCA/releases/download/2.0/Install-To-Windows.exe)**
 
 SHA1:2622624D5A95F8AA62E6EA9B3585BB536B848145
 
-### Linux
+### Linux install script
 
 Download:
 **[Install-To-Linux.sh](https://github.com/smy116/RootCA/releases/download/2.0/Install-To-Linux.sh)**
 
 SHA1:82DE00412C4CFEEFB4A3B749CB3F75A4BFCCA251
 
-### Root Cert 
+### Root cert file
 
 RSA Cert:
 **[SMY-Root-CA-RSA.crt](https://github.com/smy116/RootCA/releases/download/2.0/SMY-Root-CA-RSA.crt)** 
