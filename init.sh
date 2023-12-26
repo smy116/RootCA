@@ -162,9 +162,17 @@ function  start_menu(){
             
             # 根据不同的发行版，选择不同的安装方式
             case $osRelease in
-                ubuntu|debian)
-                    # 对于Ubuntu和Debian系统
-                    install_nginx_debian_ubuntu
+                ubuntu)
+                    # 对于Ubuntu系统
+                    install_nginx_ubuntu
+                    # Start and enable Nginx service
+                    echo "Starting Nginx..."
+                    sudo systemctl start nginx
+                    sudo systemctl enable nginx
+                    ;;
+                debian)
+                    # 对于Debian系统
+                    install_nginx_debian
                     # Start and enable Nginx service
                     echo "Starting Nginx..."
                     sudo systemctl start nginx
@@ -360,13 +368,25 @@ function installCA(){
 
 }
 
-# Function to install Nginx for Debian/Ubuntu
-install_nginx_debian_ubuntu() {
-    echo "Adding Nginx repository for Debian/Ubuntu..."
+# Function to install Nginx for Ubuntu
+install_nginx_ubuntu() {
+    echo "Adding Nginx repository for Ubuntu..."
     wget https://nginx.org/keys/nginx_signing.key
     sudo apt-key add nginx_signing.key
-    sudo sh -c "echo 'deb https://nginx.org/packages/stable/ubuntu/ `lsb_release -cs` nginx' > /etc/apt/sources.list.d/nginx.list"
-    sudo sh -c "echo 'deb-src https://nginx.org/packages/stableN/ubuntu/ `lsb_release -cs` nginx' >> /etc/apt/sources.list.d/nginx.list"
+    sudo sh -c "echo 'deb https://nginx.org/packages/ubuntu/ `lsb_release -cs` nginx' > /etc/apt/sources.list.d/nginx.list"
+    sudo sh -c "echo 'deb-src https://nginx.org/packages/ubuntu/ `lsb_release -cs` nginx' >> /etc/apt/sources.list.d/nginx.list"
+    sudo apt-get update
+    echo "Installing Nginx..."
+    sudo apt-get install -y nginx
+}
+
+# Function to install Nginx for Debian
+install_nginx_debian() {
+    echo "Adding Nginx repository for Debian..."
+    wget https://nginx.org/keys/nginx_signing.key
+    sudo apt-key add nginx_signing.key
+    sudo sh -c "echo 'deb https://nginx.org/packages/debian/ `lsb_release -cs` nginx' > /etc/apt/sources.list.d/nginx.list"
+    sudo sh -c "echo 'deb-src https://nginx.org/packages/debian/ `lsb_release -cs` nginx' >> /etc/apt/sources.list.d/nginx.list"
     sudo apt-get update
     echo "Installing Nginx..."
     sudo apt-get install -y nginx
@@ -378,7 +398,7 @@ install_nginx_centos() {
     cat > /etc/yum.repos.d/nginx.repo <<EOL
 [nginx-stable]
 name=nginx stable repository
-baseurl=https://nginx.org/packages/stable/centos/\$releasever/\$basearch/
+baseurl=https://nginx.org/packages/centos/\$releasever/\$basearch/
 gpgcheck=1
 enabled=1
 gpgkey=https://nginx.org/keys/nginx_signing.key
