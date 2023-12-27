@@ -443,10 +443,12 @@ EOL
 
 # Function to install Nginx for alpine
 install_nginx_alpine() {
+    apk update
+    apk add openssl curl ca-certificates
     ALPINE_VERSION=$(cat /etc/alpine-release | cut -d '.' -f 1-2)
     echo "http://nginx.org/packages/alpine/v${ALPINE_VERSION}/main" >> /etc/apk/repositories
     curl -o /tmp/nginx_signing.rsa.pub https://nginx.org/keys/nginx_signing.rsa.pub
-    sudo mv /tmp/nginx_signing.rsa.pub /etc/apk/keys/
+    mv /tmp/nginx_signing.rsa.pub /etc/apk/keys/
     apk update
     apk add nginx
 }
