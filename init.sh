@@ -5,7 +5,7 @@ export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
 
 osRelease=""
-isChina=false
+isChina=0
 
 publicKey="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCaK2pVOdTT8POACgWPJ52adBHmtgx462N/Fn22r7srjYJrvPZH+zOofEbvAUTurjXAL4RD+Lc78cZRCm+CYifpweA9gmS0UTo5PaFLTGruOCzMZHfpGDnSqw5CHMS00xQx1Yozq5e+x6cNxtM0ZdQYy0x1pkhdI+W+mZIUCMaM07469At2YNqxcIcTwIXZgAR2Bd9WiogDHvVoDo1yoQBIXNN+dpA23BJQGE+hNbnasUACI6SfN6HWok2rdyQAXvzuVa7QWjhjqT0HmST8l4f4vJ6DnCKP/yZSjoO0vc72IyHduLk9qVhjhsOehLoi7AXdsX5Ab7HggTZ00Uln+ZBz root@iZ2894t29fxZ"
 
@@ -145,18 +145,31 @@ function  start_menu(){
 
         4 )
             #4. 运行哪吒监控 Agent 安装脚本
+            
             read -p "输入哪吒监控 Agent 密钥:" nezhaAgentKey
             if [[ $nezhaAgentKey == "" ]]; then
                 yellow "密钥为空！"
                 sleep 2s
                 start_menu
             fi
-            curl -L https://cdn.jsdelivr.net/gh/naiba/nezha@master/script/install.sh -o nezha.sh && chmod +x nezha.sh && sudo CN=true ./nezha.sh install_agent status-api.smy.me 443 $nezhaAgentKey --tls --disable-command-execute
+            getServerLocal
+            if [ $isChina -eq 1 ]; then
+                curl -L https://gitee.com/naibahq/nezha/raw/master/script/install.sh -o nezha.sh && chmod +x nezha.sh && sudo CN=true ./nezha.sh install_agent status-api.smy.me 443 $nezhaAgentKey --tls --disable-command-execute
+            else
+                curl -L https://raw.githubusercontent.com/naiba/nezha/master/script/install.sh -o nezha.sh && chmod +x nezha.sh && sudo CN=true ./nezha.sh install_agent status-api.smy.me 443 $nezhaAgentKey --tls --disable-command-execute
+            fi
+            
 
         ;;
 
         5 )
-            curl -O https://raw.githubusercontent.com/jinwyp/one_click_script/master/install_kernel.sh && chmod +x ./install_kernel.sh && ./install_kernel.sh
+            getServerLocal
+            if [ $isChina -eq 1 ]; then
+                curl -O https://cdn.jsdelivr.net/gh/jinwyp/one_click_script@master/install_kernel.sh && chmod +x ./install_kernel.sh && ./install_kernel.sh
+            else
+                curl -O https://raw.githubusercontent.com/jinwyp/one_click_script/master/install_kernel.sh && chmod +x ./install_kernel.sh && ./install_kernel.sh
+            fi
+            
         ;;
 
         6 )
@@ -186,6 +199,14 @@ function  start_menu(){
                     echo "Starting Nginx..."
                     sudo systemctl start nginx
                     sudo systemctl enable nginx
+                    ;;
+                alpine)
+                    # 对于Alpine系统
+                    install_nginx_alpine
+                    # Start and enable Nginx service
+                    echo "Starting Nginx..."
+                    rc-service nginx start
+                    rc-update add nginx default
                     ;;
                 *)
                     yellow "不支持的Linux发行版: $osRelease"
@@ -239,7 +260,7 @@ function bold(){
     echo -e "\033[1m\033[01m$1\033[0m"
 }
 
-# 检测系统发行版代号，返回centos,debian,ubuntu,openwrt,other
+# 检测系统发行版代号，返回centos,debian,ubuntu,alpine,openwrt,other
 function getLinuxOSRelease(){
     
     if [[ -f /etc/redhat-release ]]; then
@@ -250,12 +271,16 @@ function getLinuxOSRelease(){
         osRelease="ubuntu"
     elif cat /etc/issue | grep -Eqi "centos|red hat|redhat"; then
         osRelease="centos"
+    elif cat /etc/issue | grep -Eqi "alpine"; then
+        osRelease="alpine"
     elif cat /proc/version | grep -Eqi "debian|raspbian"; then
         osRelease="debian"
     elif cat /proc/version | grep -Eqi "ubuntu"; then
         osRelease="ubuntu"
     elif cat /proc/version | grep -Eqi "centos|red hat|redhat"; then
         osRelease="centos"
+    elif cat /proc/version | grep -Eqi "alpine"; then
+        osRelease="alpine"
     elif command -v opkg >/dev/null 2>&1; then
         osRelease="openwrt"
     else
@@ -267,9 +292,9 @@ function getLinuxOSRelease(){
 # 判断服务器是否在中国
 function getServerLocal(){
     if [[ $(curl -m 10 -s https://ipapi.co/json | grep 'China') != "" ]]; then
-            isChina=true
-        else
-            isChina=false
+        isChina=1
+    else
+        isChina=0
     fi
 
 }
@@ -415,6 +440,16 @@ EOL
     sudo yum install -y nginx
 }
 
+
+# Function to install Nginx for alpine
+install_nginx_alpine() {
+    ALPINE_VERSION=$(cat /etc/alpine-release | cut -d '.' -f 1-2)
+    echo "http://nginx.org/packages/alpine/v${ALPINE_VERSION}/main" >> /etc/apk/repositories
+    curl -o /tmp/nginx_signing.rsa.pub https://nginx.org/keys/nginx_signing.rsa.pub
+    sudo mv /tmp/nginx_signing.rsa.pub /etc/apk/keys/
+    apk update
+    apk add nginx
+}
 
 # 接收到的参数，选择要执行的操作
 case $1 in
