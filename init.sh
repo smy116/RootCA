@@ -5,6 +5,7 @@ export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
 
 osRelease=""
+isChina=false
 
 publicKey="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCaK2pVOdTT8POACgWPJ52adBHmtgx462N/Fn22r7srjYJrvPZH+zOofEbvAUTurjXAL4RD+Lc78cZRCm+CYifpweA9gmS0UTo5PaFLTGruOCzMZHfpGDnSqw5CHMS00xQx1Yozq5e+x6cNxtM0ZdQYy0x1pkhdI+W+mZIUCMaM07469At2YNqxcIcTwIXZgAR2Bd9WiogDHvVoDo1yoQBIXNN+dpA23BJQGE+hNbnasUACI6SfN6HWok2rdyQAXvzuVa7QWjhjqT0HmST8l4f4vJ6DnCKP/yZSjoO0vc72IyHduLk9qVhjhsOehLoi7AXdsX5Ab7HggTZ00Uln+ZBz root@iZ2894t29fxZ"
 
@@ -259,6 +260,16 @@ function getLinuxOSRelease(){
         osRelease="openwrt"
     else
         osRelease="other"
+    fi
+
+}
+
+# 判断服务器是否在中国
+function getServerLocal(){
+    if [[ $(curl -m 10 -s https://ipapi.co/json | grep 'China') != "" ]]; then
+            isChina=true
+        else
+            isChina=false
     fi
 
 }
