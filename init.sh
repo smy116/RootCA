@@ -75,7 +75,8 @@ function  start_menu(){
     clear
 
     green " ================================================================="
-    green " SMY 环境一键部署脚本 | 系统支持：Centos / Debian / Ubuntu / Openwrt"
+    green " SMY 环境一键部署脚本"
+    green " 系统支持：Centos / Debian / Ubuntu / Openwrt / Alpine"
     green " ================================================================="
     green " 当前系统类型：$osRelease"
     echo
