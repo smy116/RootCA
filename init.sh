@@ -75,12 +75,13 @@ function  start_menu(){
     green " 当前系统类型：$osRelease"
     echo
     green " 1. 设置北京时区"
-    green " 2. 配置SSH及Root账户"
-    green " 3. 安装 SMY Root Certification Authority"
-    green " 4. 运行哪吒监控 Agent 安装脚本"
-    green " 5. 运行Linux内核 BBR Cloudflare WARP安装脚本"
-    green " 6. 从Nginx源安装 Nginx Stable version"
-    green " 7. 运行ACME Shell script: acme.sh"
+    green " 2. 配置 SSH 及 Root 账户"
+    green " 3. 修改 SSH 端口为 54422"
+    green " 4. 安装 SMY Root Certification Authority"
+    green " 5. 运行哪吒监控 Agent 安装脚本"
+    green " 6. 运行 Linux内核 BBR Cloudflare WARP安装脚本"
+    green " 7. 从 Nginx 源安装 Nginx Stable version"
+    green " 8. 运行 ACME Shell script: acme.sh"
     green " 9. 重启系统"
     green " 0. 退出脚本"
 
@@ -126,8 +127,8 @@ function  start_menu(){
         ;;
 
         3 )
-        #3. 安装 SMY Root Certification Authority
-            installCA
+        #3. 修改 SSH 端口为 54422
+            changeSshPort
             read -p "是否返回主菜单? 直接回车默认返回主菜单, 请输入[Y/n]:" isContinueInput
             isContinueInput=${isContinueInput:-Y}
 
@@ -139,7 +140,20 @@ function  start_menu(){
         ;;
 
         4 )
-            #4. 运行哪吒监控 Agent 安装脚本
+        #4. 安装 SMY Root Certification Authority
+            installCA
+            read -p "是否返回主菜单? 直接回车默认返回主菜单, 请输入[Y/n]:" isContinueInput
+            isContinueInput=${isContinueInput:-Y}
+
+            if [[ $isContinueInput == [Yy] ]]; then
+                start_menu
+            else 
+                exit 0
+            fi
+        ;;
+
+        5 )
+        #5. 运行哪吒监控 Agent 安装脚本
             
             read -p "输入哪吒监控 Agent 密钥:" nezhaAgentKey
             if [[ $nezhaAgentKey == "" ]]; then
@@ -157,7 +171,8 @@ function  start_menu(){
 
         ;;
 
-        5 )
+        6 )
+        #6. 运行 Linux内核 BBR Cloudflare WARP安装脚本
             getServerLocal
             if [ $isChina -eq 1 ]; then
                 curl -O https://cdn.jsdelivr.net/gh/jinwyp/one_click_script@master/install_kernel.sh && chmod +x ./install_kernel.sh && ./install_kernel.sh
@@ -167,7 +182,8 @@ function  start_menu(){
             
         ;;
 
-        6 )
+        7 )
+        #7. 从 Nginx 源安装 Nginx Stable version
             
             # 根据不同的发行版，选择不同的安装方式
             case $osRelease in
@@ -216,11 +232,13 @@ function  start_menu(){
             fi
         ;;
 
-        7 )
+        8 )
+        #8. 运行 ACME Shell script: acme.sh
             curl https://get.acme.sh | sh -s email=cdhcudgv@dasihcys.com
         ;;
 
         9 )
+        #9. 重启系统
             reboot
         ;;
 
@@ -364,6 +382,39 @@ function setLinuxDateZone(){
 
 }
 
+# 修改ssh端口
+function changeSshPort(){
+
+    if [ -f /etc/default/dropbear ]; then
+        # dropbear
+        sed -i "/DROPBEAR_PORT/c\DROPBEAR_PORT=54422" /etc/default/dropbear
+        sed -i "s/^DROPBEAR_PORT=.*/DROPBEAR_PORT=54422/" /etc/default/dropbear
+        
+        #sudo service dropbear restart
+        green "修改SSH端口成功! 新的端口为 54422"
+    
+    elif [ -f /etc/config/dropbear ]; then
+        uci set dropbear.@dropbear[0].Port=54422
+        uci commit dropbear
+
+        #/etc/init.d/dropbear restart
+        green "修改SSH端口成功! 新的端口为 54422"
+
+    elif [ -f /etc/ssh/sshd_config ]; then
+        # sshd
+
+        sed -i "/^#Port .*/c\Port 54422" /etc/ssh/sshd_config
+        sudo sed -i "s/^Port .*/Port 54422/" /etc/ssh/sshd_config
+        
+        #sudo systemctl restart sshd
+        green "修改SSH端口成功! 新的端口为 54422"
+
+    else
+        yellow "SSH端口修改失败，无法识别SSH Server的类型" 
+    fi
+
+}
+
 # 安装CA
 function installCA(){
     # 根据不同的发行版，执行不同的命令导入证书
@@ -456,6 +507,14 @@ case $1 in
         installCA
         exit 0
         ;;
+
+    sshport)
+        getLinuxOSRelease
+        # 修改 SSH 端口为 54422
+        changeSshPort
+        exit 0
+        ;;
+
     root)
         getLinuxOSRelease
         # 配置SSH及Root账户
