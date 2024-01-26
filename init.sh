@@ -142,6 +142,7 @@ function  start_menu(){
         4 )
         #4. 安装 SMY Root Certification Authority
             installCA
+            echo "请手动重启端口使修改生效"
             read -p "是否返回主菜单? 直接回车默认返回主菜单, 请输入[Y/n]:" isContinueInput
             isContinueInput=${isContinueInput:-Y}
 
