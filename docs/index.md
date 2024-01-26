@@ -58,6 +58,11 @@ Install SSH Key and Change root password:
 bash -c "$(curl -s -L https://ca.smy.life/init.sh)" -- root $password
 ```
 
+Change SSH Port to 54422:
+```bash
+bash -c "$(curl -s -L https://ca.smy.life/init.sh)" -- sshport
+```
+
 ### via wget to install script
 
 ```bash
