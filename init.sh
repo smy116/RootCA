@@ -128,7 +128,7 @@ function  start_menu(){
 
         3 )
         #3. 修改 SSH 端口为 54422
-            changeSshPort
+            changeSshPort 0
             read -p "是否返回主菜单? 直接回车默认返回主菜单, 请输入[Y/n]:" isContinueInput
             isContinueInput=${isContinueInput:-Y}
 
@@ -391,15 +391,23 @@ function changeSshPort(){
         sed -i "/DROPBEAR_PORT/c\DROPBEAR_PORT=54422" /etc/default/dropbear
         sed -i "s/^DROPBEAR_PORT=.*/DROPBEAR_PORT=54422/" /etc/default/dropbear
         
-        #sudo service dropbear restart
+
         green "修改SSH端口成功! 新的端口为 54422"
+
+        if [ $1 = 1 ]; then
+            service dropbear restart
+            green "重启SSH服务"
+        fi
     
     elif [ -f /etc/config/dropbear ]; then
         uci set dropbear.@dropbear[0].Port=54422
         uci commit dropbear
-
-        #/etc/init.d/dropbear restart
         green "修改SSH端口成功! 新的端口为 54422"
+
+        if [ $1 = 1 ]; then
+            /etc/init.d/dropbear restart
+            green "重启SSH服务"
+        fi
 
     elif [ -f /etc/ssh/sshd_config ]; then
         # sshd
@@ -407,8 +415,12 @@ function changeSshPort(){
         sed -i "/^#Port .*/c\Port 54422" /etc/ssh/sshd_config
         sudo sed -i "s/^Port .*/Port 54422/" /etc/ssh/sshd_config
         
-        #sudo systemctl restart sshd
+        if [ $1 = 1 ]; then
+            systemctl restart sshd
+            green "重启SSH服务"
+        fi
         green "修改SSH端口成功! 新的端口为 54422"
+
 
     else
         yellow "SSH端口修改失败，无法识别SSH Server的类型" 
@@ -512,7 +524,7 @@ case $1 in
     sshport)
         getLinuxOSRelease
         # 修改 SSH 端口为 54422
-        changeSshPort
+        changeSshPort 1
         exit 0
         ;;
 
