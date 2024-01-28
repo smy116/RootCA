@@ -1,2 +1,2 @@
 Please visit:
-**[https://ca.smy.life](https://ca.smy.life)**
+**[https://ca.smy.me](https://ca.smy.me)**
