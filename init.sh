@@ -69,21 +69,21 @@ function  start_menu(){
     clear
 
     green " ================================================================="
-    green " SMY 环境一键部署脚本"
-    green " 系统支持：Centos / Debian / Ubuntu / Openwrt / Alpine"
+    green " SMY One-click deployment script"
+    green " Support: / Debian / Ubuntu / Openwrt / Alpine"
     green " ================================================================="
-    green " 当前系统类型：$osRelease"
+    green " System type：$osRelease"
     echo
-    green " 1. 设置北京时区"
-    green " 2. 配置 SSH 及 Root 账户"
-    green " 3. 修改 SSH 端口为 54422"
-    green " 4. 安装 SMY Root Certification Authority"
-    green " 5. 运行哪吒监控 Agent 安装脚本"
-    green " 6. 运行 Linux内核 BBR Cloudflare WARP安装脚本"
-    green " 7. 从 Nginx 源安装 Nginx Stable version"
-    green " 8. 运行 ACME Shell script: acme.sh"
-    green " 9. 重启系统"
-    green " 0. 退出脚本"
+    green " 1. Set the Time zone to UTC+8"
+    green " 2. Configure SSH and Root accounts"
+    green " 3. Set SSH port to 54422"
+    green " 4. Install SMY Root Certification Authority"
+    green " 5. Run Nezha-agent script"
+    green " 6. Run BBR Cloudflare WARP script"
+    green " 7. Install Nginx Stable version"
+    green " 8. Run ACME Shell script: acme.sh"
+    green " 9. Reboot system"
+    green " 0. Exit script"
 
     echo
     read -p "Please input number:" menuNumberInput
@@ -94,7 +94,7 @@ function  start_menu(){
             echo "设置北京时区........"
             setLinuxDateZone
 
-            read -p "是否返回主菜单? 直接回车默认返回主菜单, 请输入[Y/n]:" isContinueInput
+            read -p "Return to the Menu? Enter to return to the Menu by Default, Please enter [Y/n]:" isContinueInput
             isContinueInput=${isContinueInput:-Y}
 
             if [[ $isContinueInput == [Yy] ]]; then
@@ -107,15 +107,15 @@ function  start_menu(){
 
         2 )
         #2. 配置SSH及Root账户 
-            echo "设置SSH root 登录........"
-            yellow "请输入新的root账户密码"
+            echo "Set SSH root login........"
+            yellow "Please enter a new root password"
             passwd root
-            green "修改root密码为成功！"
-            echo "写入SSH公钥........"
+            green "Change root password successful！"
+            echo "Import SSH public key........"
             setPublicKey
-            green "设置成功, 请用SSH工具软件登陆服务器!"
+            green "Successful！, Please login to the server using SSH tool software!"
             
-            read -p "是否返回主菜单? 直接回车默认返回主菜单, 请输入[Y/n]:" isContinueInput
+            read -p "Return to the Menu? Enter to return to the Menu by Default, Please enter [Y/n]:" isContinueInput
             isContinueInput=${isContinueInput:-Y}
 
             if [[ $isContinueInput == [Yy] ]]; then
@@ -129,7 +129,7 @@ function  start_menu(){
         3 )
         #3. 修改 SSH 端口为 54422
             changeSshPort 0
-            read -p "是否返回主菜单? 直接回车默认返回主菜单, 请输入[Y/n]:" isContinueInput
+            read -p "Return to the Menu? Enter to return to the Menu by Default, Please enter [Y/n]:" isContinueInput
             isContinueInput=${isContinueInput:-Y}
 
             if [[ $isContinueInput == [Yy] ]]; then
@@ -142,8 +142,8 @@ function  start_menu(){
         4 )
         #4. 安装 SMY Root Certification Authority
             installCA
-            echo "请手动重启端口使修改生效"
-            read -p "是否返回主菜单? 直接回车默认返回主菜单, 请输入[Y/n]:" isContinueInput
+            echo "Please manually reboot to make the changes take effect"
+            read -p "Return to the Menu? Enter to return to the Menu by Default, Please enter [Y/n]:" isContinueInput
             isContinueInput=${isContinueInput:-Y}
 
             if [[ $isContinueInput == [Yy] ]]; then
@@ -156,9 +156,9 @@ function  start_menu(){
         5 )
         #5. 运行哪吒监控 Agent 安装脚本
             
-            read -p "输入哪吒监控 Agent 密钥:" nezhaAgentKey
+            read -p "Enter the Nezha-agent token:" nezhaAgentKey
             if [[ $nezhaAgentKey == "" ]]; then
-                yellow "密钥为空！"
+                yellow "Token is empty！"
                 sleep 2s
                 start_menu
             fi
@@ -221,7 +221,7 @@ function  start_menu(){
                     rc-update add nginx default
                     ;;
                 *)
-                    yellow "不支持的Linux发行版: $osRelease"
+                    yellow "Unsupported Linux version: $osRelease"
                     ;;
             esac
 
@@ -249,7 +249,7 @@ function  start_menu(){
 
         * )
             clear
-            red "请输入正确数字 !"
+            red "Please enter the option!"
             sleep 2s
             start_menu
         ;;
@@ -345,7 +345,7 @@ function setPublicKey(){
         sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
         sed -i 's/^PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
 
-        green "禁用SSH密码认证，并写入SSH公钥成功!"
+        green "Disable SSH password authentication and successfully import SSH public key!"
 
         # 重启SSH服务
         if command -v systemctl &>/dev/null; then
@@ -354,7 +354,7 @@ function setPublicKey(){
             service ssh restart
         fi
     else
-        yellow "SSH公钥导入失败，无法识别SSH Server的类型" 
+        yellow "SSH public key import failed, Unable to recognize SSH Server" 
     fi
 
 }
@@ -367,14 +367,14 @@ function setLinuxDateZone(){
 
     echo
     if [[ ${tempCurrentDateZone} == "+0800" ]]; then
-        yellow "当前时区已经为北京时间  $tempCurrentDateZone | $(date -R) "
+        yellow "The current Time-zone is already set to UTC+8 $tempCurrentDateZone | $(date -R) "
     else 
 
         if [[ -f /etc/localtime ]] && [[ -f /usr/share/zoneinfo/Asia/Shanghai ]];  then
             mv /etc/localtime /etc/localtime.bak
             cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
-            yellow " 当前时区已设置为 $(date -R)"
+            yellow " The current time zone has been set to $(date -R)"
             green " =================================================="
         fi
 
@@ -392,21 +392,21 @@ function changeSshPort(){
         sed -i "s/^DROPBEAR_PORT=.*/DROPBEAR_PORT=54422/" /etc/default/dropbear
         
 
-        green "修改SSH端口成功! 新的端口为 54422"
+        green "Successfully modified SSH port! The new port is 54422"
 
         if [ $1 = 1 ]; then
             service dropbear restart
-            green "重启SSH服务"
+            echo "Restart SSH server"
         fi
     
     elif [ -f /etc/config/dropbear ]; then
         uci set dropbear.@dropbear[0].Port=54422
         uci commit dropbear
-        green "修改SSH端口成功! 新的端口为 54422"
+        green "Successfully modified SSH port! The new port is 54422"
 
         if [ $1 = 1 ]; then
             /etc/init.d/dropbear restart
-            green "重启SSH服务"
+            echo "Restart SSH server"
         fi
 
     elif [ -f /etc/ssh/sshd_config ]; then
@@ -417,13 +417,13 @@ function changeSshPort(){
         
         if [ $1 = 1 ]; then
             systemctl restart sshd
-            green "重启SSH服务"
+            echo "Restart SSH server"
         fi
-        green "修改SSH端口成功! 新的端口为 54422"
+        green "Successfully modified SSH port! The new port is 54422"
 
 
     else
-        yellow "SSH端口修改失败，无法识别SSH Server的类型" 
+        yellow "SSH port modification failed, Unable to recognize SSH Server" 
     fi
 
 }
@@ -450,11 +450,11 @@ function installCA(){
             echo "$ECC_Content" > "/etc/ssl/certs/SMY-Root-CA-ECC.crt"
             ;;
         *)
-            yellow "不支持的Linux发行版: $osRelease"
+            yellow "Unsupported Linux version: $osRelease"
             ;;
     esac
 
-    green "证书已导入并更新。"
+    green "CA has been imported and updated"
     
 
 }
