@@ -519,22 +519,40 @@ create_nginx_config() {
     # write config
     cat >/etc/nginx/nginx.conf << "EOF"
 user  nginx;
-worker_processes  auto;
-error_log  off;
+worker_processes     auto;
+worker_rlimit_nofile 65535;
 pid        /var/run/nginx.pid;
 events {
-    worker_connections  1024;
+    worker_connections 65535;
+    multi_accept       on;
 }
 http {
-    include       /etc/nginx/mime.types;
-    default_type  application/octet-stream;
-    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-                      '$status $body_bytes_sent "$http_referer" '
-                      '"$http_user_agent" "$http_x_forwarded_for"';
-    access_log  off;
-    sendfile        on;
+    include                mime.types;
+    default_type           application/octet-stream;
+
+    access_log             off;
+    error_log              /dev/null;
+
+    charset                utf-8;
+    sendfile               on;
+    tcp_nopush             on;
+    tcp_nodelay            on;
+    server_tokens          off;
+    log_not_found          off;
+    client_header_buffer_size 512k;
+    large_client_header_buffers 4 512k;
+    client_max_body_size 2000m;
+    types_hash_max_size    2048;
+    types_hash_bucket_size 64;
+
     keepalive_timeout  65;
-    gzip  on;
+
+    gzip            on;
+    gzip_vary       on;
+    gzip_proxied    any;
+    gzip_comp_level 6;
+    gzip_types      text/plain text/css text/xml application/json application/javascript application/rss+xml application/atom+xml image/svg+xml;
+    
     ssl_session_timeout    1d;
     ssl_session_cache      shared:SSL:10m;
     ssl_session_tickets    off;
@@ -545,9 +563,7 @@ http {
 
     ssl_stapling           on;
     ssl_stapling_verify    on;    
-    client_header_buffer_size 512k;
-    large_client_header_buffers 4 512k;
-    client_max_body_size 2000m;
+
     map $http_upgrade $connection_upgrade {
         default upgrade;
         ""      close;
