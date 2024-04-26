@@ -583,8 +583,6 @@ http {
     server {
         listen       80 default_server;
         listen       [::]:80 default_server;
-        index        index.html index.htm;
-        root         /usr/share/nginx/html;
         location ^~ /.well-known/acme-challenge/ {
             root /usr/share/nginx/acme-challenge;
         }
