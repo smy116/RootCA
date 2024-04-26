@@ -438,7 +438,7 @@ function installCA(){
     case $osRelease in
         ubuntu|debian)
             # 对于Ubuntu和Debian系统
-            apt install ca-certificates
+            apt install -y ca-certificates
             echo "$RSA_Content" > "/usr/local/share/ca-certificates/SMY-Root-CA-RSA.crt"
             echo "$ECC_Content" > "/usr/local/share/ca-certificates/SMY-Root-CA-ECC.crt"
             update-ca-certificates
@@ -467,7 +467,7 @@ function installCA(){
 # Function to install Nginx for Ubuntu
 install_nginx_ubuntu() {
     apt update
-    apt install curl gnupg2 ca-certificates lsb-release ubuntu-keyring
+    apt install -y curl gnupg2 ca-certificates lsb-release ubuntu-keyring
     echo "Adding Nginx repository for Ubuntu..."
     wget https://nginx.org/keys/nginx_signing.key
     sudo apt-key add nginx_signing.key
@@ -481,7 +481,7 @@ install_nginx_ubuntu() {
 # Function to install Nginx for Debian
 install_nginx_debian() {
     apt update
-    apt install curl gnupg2 ca-certificates lsb-release debian-archive-keyring
+    apt install -y curl gnupg2 ca-certificates lsb-release debian-archive-keyring
     echo "Adding Nginx repository for Debian..."
     wget https://nginx.org/keys/nginx_signing.key
     sudo apt-key add nginx_signing.key
