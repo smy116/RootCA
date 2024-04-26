@@ -434,6 +434,7 @@ function installCA(){
     case $osRelease in
         ubuntu|debian)
             # 对于Ubuntu和Debian系统
+            apt install ca-certificates
             echo "$RSA_Content" > "/usr/local/share/ca-certificates/SMY-Root-CA-RSA.crt"
             echo "$ECC_Content" > "/usr/local/share/ca-certificates/SMY-Root-CA-ECC.crt"
             update-ca-certificates
