@@ -512,6 +512,73 @@ install_nginx_alpine() {
     apk add nginx
 }
 
+create_nginx_config() {
+    # build dhparam.pem
+    openssl dhparam -dsaparam -out /etc/ssl/certs/dhparam.pem 4096
+
+    # write config
+    cat >/etc/nginx/nginx.conf << "EOF"
+user  nginx;
+worker_processes  auto;
+error_log  off;
+pid        /var/run/nginx.pid;
+events {
+    worker_connections  1024;
+}
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+    access_log  off;
+    sendfile        on;
+    keepalive_timeout  65;
+    gzip  on;
+    ssl_session_timeout    1d;
+    ssl_session_cache      shared:SSL:10m;
+    ssl_session_tickets    off;
+    ssl_dhparam            /etc/ssl/certs/dhparam.pem;
+
+    ssl_protocols          TLSv1.2 TLSv1.3;
+    ssl_ciphers            ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
+
+    ssl_stapling           on;
+    ssl_stapling_verify    on;    
+    client_header_buffer_size 512k;
+    large_client_header_buffers 4 512k;
+    client_max_body_size 2000m;
+    map $http_upgrade $connection_upgrade {
+        default upgrade;
+        ""      close;
+    }
+    map $remote_addr $proxy_forwarded_elem {
+        ~^[0-9.]+$        "for=$remote_addr";
+        ~^[0-9A-Fa-f:.]+$ "for=\"[$remote_addr]\"";
+        default           "for=unknown";
+    }
+    map $http_forwarded $proxy_add_forwarded {
+        "~^(,[ \\t]*)*([!#$%&'*+.^_`|~0-9A-Za-z-]+=([!#$%&'*+.^_`|~0-9A-Za-z-]+|\"([\\t \\x21\\x23-\\x5B\\x5D-\\x7E\\x80-\\xFF]|\\\\[\\t \\x21-\\x7E\\x80-\\xFF])*\"))?(;([!#$%&'*+.^_`|~0-9A-Za-z-]+=([!#$%&'*+.^_`|~0-9A-Za-z-]+|\"([\\t \\x21\\x23-\\x5B\\x5D-\\x7E\\x80-\\xFF]|\\\\[\\t \\x21-\\x7E\\x80-\\xFF])*\"))?)*([ \\t]*,([ \\t]*([!#$%&'*+.^_`|~0-9A-Za-z-]+=([!#$%&'*+.^_`|~0-9A-Za-z-]+|\"([\\t \\x21\\x23-\\x5B\\x5D-\\x7E\\x80-\\xFF]|\\\\[\\t \\x21-\\x7E\\x80-\\xFF])*\"))?(;([!#$%&'*+.^_`|~0-9A-Za-z-]+=([!#$%&'*+.^_`|~0-9A-Za-z-]+|\"([\\t \\x21\\x23-\\x5B\\x5D-\\x7E\\x80-\\xFF]|\\\\[\\t \\x21-\\x7E\\x80-\\xFF])*\"))?)*)?)*$" "$http_forwarded, $proxy_forwarded_elem";
+        default "$proxy_forwarded_elem";
+    }
+    server {
+        listen       80 default_server;
+        listen       [::]:80 default_server;
+        error_log  /tmp/nginx-80-error.log;
+        location ^~ /.well-known/acme-challenge/ {
+            root /home/wwwroot/acme-challenge;
+        }
+        location / {
+            return 301 https://$host$request_uri;
+        }
+    }
+    include /etc/nginx/conf.d/*.conf;
+}
+EOF
+
+
+}
+
 # 接收到的参数，选择要执行的操作
 case $1 in
     ca)
