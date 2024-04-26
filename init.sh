@@ -461,6 +461,8 @@ function installCA(){
 
 # Function to install Nginx for Ubuntu
 install_nginx_ubuntu() {
+    apt update
+    apt install curl gnupg2 ca-certificates lsb-release ubuntu-keyring
     echo "Adding Nginx repository for Ubuntu..."
     wget https://nginx.org/keys/nginx_signing.key
     sudo apt-key add nginx_signing.key
@@ -473,6 +475,8 @@ install_nginx_ubuntu() {
 
 # Function to install Nginx for Debian
 install_nginx_debian() {
+    apt update
+    apt install curl gnupg2 ca-certificates lsb-release debian-archive-keyring
     echo "Adding Nginx repository for Debian..."
     wget https://nginx.org/keys/nginx_signing.key
     sudo apt-key add nginx_signing.key
@@ -485,6 +489,7 @@ install_nginx_debian() {
 
 # Function to install Nginx for CentOS/RHEL
 install_nginx_centos() {
+    yum install yum-utils
     echo "Adding Nginx repository for CentOS/RHEL..."
     cat > /etc/yum.repos.d/nginx.repo <<EOL
 [nginx-stable]
