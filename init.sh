@@ -521,6 +521,11 @@ install_nginx_alpine() {
 create_nginx_config() {
     mkdir -p /usr/share/nginx/acme-challenge
     mkdir -p /usr/share/nginx/html
+
+    # download html
+    curl -o html.tar.gz  https://cdn.jsdelivr.net/gh/smy116/RootCA@main/nginx/html.tar.gz
+    tar -zxvf html.tar.gz -C /usr/share/nginx/html
+    rm -rf html.tar.gz
     
     # build dhparam.pem
     openssl dhparam -dsaparam -out /etc/ssl/certs/dhparam.pem 4096
