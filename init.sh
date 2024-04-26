@@ -513,6 +513,9 @@ install_nginx_alpine() {
 }
 
 create_nginx_config() {
+    mkdir -p /usr/share/nginx/acme-challenge
+    mkdir -p /usr/share/nginx/html
+    
     # build dhparam.pem
     openssl dhparam -dsaparam -out /etc/ssl/certs/dhparam.pem 4096
 
@@ -580,9 +583,10 @@ http {
     server {
         listen       80 default_server;
         listen       [::]:80 default_server;
-        error_log  /tmp/nginx-80-error.log;
+        index        index.html index.htm;
+        root         /usr/share/nginx/html;
         location ^~ /.well-known/acme-challenge/ {
-            root /home/wwwroot/acme-challenge;
+            root /usr/share/nginx/acme-challenge;
         }
         location / {
             return 301 https://$host$request_uri;
