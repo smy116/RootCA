@@ -22,27 +22,16 @@ Shortcut:
 
 ### Root cert file
 
-RSA cert:
-**[SMY-Root-CA-RSA.crt](https://github.com/smy116/RootCA/releases/download/2.0/SMY-Root-CA-RSA.crt)** 
+Cert:
+**[SMY-Root-CA-ECC.crt](https://github.com/smy116/RootCA/releases/download/2.0/SMY-Root-CA.crt)** 
 
 Test page:
-**[https://test-rsa.ca.smy.me](https://test-rsa.ca.smy.me)** 
-
-SHA1:75FC84ABD78F155AF3030D19735C9826ADD1A9B0
-
-Shortcut:
-**[https://ca.smy.me/ca-rsa](https://ca.smy.me/ca-rsa)**
-
-ECC Cert:
-**[SMY-Root-CA-ECC.crt](https://github.com/smy116/RootCA/releases/download/2.0/SMY-Root-CA-ECC.crt)** 
-
-Test page:
-**[https://test-ecc.ca.smy.me](https://test-ecc.ca.smy.me)** 
+**[https://test-ecc.ca.smy.me](https://test.ca.smy.me)** 
 
 SHA1:87C2991C8409C88A4956D54FB4AF3F955233F797
 
 Shortcut:
-**[https://ca.smy.me/ca-ecc](https://ca.smy.me/ca-ecc)**
+**[https://ca.smy.me/ca-ecc](https://ca.smy.me/ca)**
 
 ## VPS init script
 
