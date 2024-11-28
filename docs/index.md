@@ -8,7 +8,7 @@ Download:
 SHA1:2622624D5A95F8AA62E6EA9B3585BB536B848145
 
 Shortcut:
-**[https://ca.smy.me/windows](https://ca.smy.me/windows)**
+**[https://ca.smy.life/windows](https://ca.smy.life/windows)**
 
 ### Linux install script
 
@@ -18,7 +18,7 @@ Download:
 SHA1:82DE00412C4CFEEFB4A3B749CB3F75A4BFCCA251
 
 Shortcut:
-**[https://ca.smy.me/linux](https://ca.smy.me/linux)**
+**[https://ca.smy.life/linux](https://ca.smy.life/linux)**
 
 ### Root cert file
 
@@ -31,7 +31,7 @@ Test page:
 SHA1:87C2991C8409C88A4956D54FB4AF3F955233F797
 
 Shortcut:
-**[https://ca.smy.me/ca](https://ca.smy.me/ca)**
+**[https://ca.smy.life/ca](https://ca.smy.life/ca)**
 
 ## VPS init script
 
@@ -39,27 +39,27 @@ Shortcut:
 ###  via curl to install script
 
 ```bash
-bash -c "$(curl -s -L https://ca.smy.me/init.sh)"
+bash -c "$(curl -s -L https://ca.smy.life/init.sh)"
 ```
 
 #### Shortcut
 Install Root CA:
 ```bash
-bash -c "$(curl -s -L https://ca.smy.me/init.sh)" -- ca
+bash -c "$(curl -s -L https://ca.smy.life/init.sh)" -- ca
 ```
 
 Install SSH Key and Change root password:
 ```bash
-bash -c "$(curl -s -L https://ca.smy.me/init.sh)" -- root $password
+bash -c "$(curl -s -L https://ca.smy.life/init.sh)" -- root $password
 ```
 
 Change SSH Port to 54422:
 ```bash
-bash -c "$(curl -s -L https://ca.smy.me/init.sh)" -- sshport
+bash -c "$(curl -s -L https://ca.smy.life/init.sh)" -- sshport
 ```
 
 ### via wget to install script
 
 ```bash
-bash -c "$(wget -q -O - https://ca.smy.me/init.sh)"
+bash -c "$(wget -q -O - https://ca.smy.life/init.sh)"
 ```
