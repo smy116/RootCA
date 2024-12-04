@@ -120,20 +120,14 @@ function  start_menu(){
         5 )
         #5. 运行哪吒监控 Agent 安装脚本
             
-            read -p "Enter the Nezha-agent token:" nezhaAgentKey
-            if [[ $nezhaAgentKey == "" ]]; then
-                yellow "Token is empty！"
+            read -p "Enter the Nezha Client Secret:" nezhaClientSecret
+            if [[ $nezhaClientSecret == "" ]]; then
+                yellow "Client Secret is empty！"
                 sleep 2s
                 start_menu
             fi
-            getServerLocal
-            if [ $isChina -eq 1 ]; then
-                curl -L https://gitee.com/naibahq/nezha/raw/master/script/install.sh -o nezha.sh && chmod +x nezha.sh && sudo CN=true ./nezha.sh install_agent status-api.smy.me 443 $nezhaAgentKey --tls --disable-command-execute
-            else
-                curl -L https://raw.githubusercontent.com/nezhahq/scripts/v0/install.sh -o nezha.sh && chmod +x nezha.sh && sudo ./nezha.sh install_agent status-api.smy.me 443 $nezhaAgentKey --tls --disable-command-execute
-            fi
-            
-
+            curl -L https://raw.githubusercontent.com/nezhahq/scripts/main/agent/install.sh -o nezha.sh && chmod +x nezha.sh && env NZ_SERVER=status.smy.me:443 NZ_TLS=true NZ_DISABLE_COMMAND_EXECUTE=true NZ_DISABLE_NAT=true NZ_CLIENT_SECRET=$nezhaClientSecret ./nezha.sh
+ 
         ;;
 
         6 )
