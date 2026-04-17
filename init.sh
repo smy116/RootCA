@@ -44,8 +44,9 @@ function  start_menu(){
     green " 3. Set SSH port to 54422"
     green " 4. Install SMY Root Certification Authority"
     green " 5. Run Nezha-agent script"
-    green " 6. Install Nginx Stable version"
-    green " 7. Reboot system"
+    green " 6. Install Nginx"
+    green " 7. Install Caddy"
+    green " 8. Reboot system"
     green " 0. Exit script"
 
     echo
@@ -146,6 +147,12 @@ function  start_menu(){
         ;;
 
         7 )
+        #7. 安装 Caddy
+            install_caddy
+            back_to_menu
+        ;;
+
+        8 )
         #8. 重启系统
             reboot
         ;;
@@ -428,6 +435,115 @@ function installNezha(){
     rm -f nezha.sh
 }
 
+# Function to install Caddy for Ubuntu
+install_caddy_ubuntu() {
+    pkg_update
+    pkg_install curl debian-keyring debian-archive-keyring apt-transport-https
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
+    pkg_update
+    pkg_install caddy
+}
+
+# Function to install Caddy for Debian
+install_caddy_debian() {
+    pkg_update
+    pkg_install curl debian-keyring debian-archive-keyring apt-transport-https
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
+    pkg_update
+    pkg_install caddy
+}
+
+# Function to install Caddy for CentOS/RHEL
+install_caddy_centos() {
+    pkg_install yum-utils
+    yum install -y 'dnf-command(copr)'
+    yum copr enable -y @caddy/caddy
+    pkg_install caddy
+}
+
+# Function to install Caddy for alpine
+install_caddy_alpine() {
+    pkg_update
+    pkg_install caddy
+}
+
+install_caddy() {
+    # 根据不同的发行版，选择不同的安装方式
+    case $osRelease in
+        ubuntu)
+            install_caddy_ubuntu
+            ;;
+        debian)
+            install_caddy_debian
+            ;;
+        centos)
+            install_caddy_centos
+            ;;
+        alpine)
+            install_caddy_alpine
+            ;;
+        *)
+            yellow "Unsupported Linux version for Caddy: $osRelease"
+            return 1
+            ;;
+    esac
+
+    create_caddy_config
+
+    # Start and enable Caddy service
+    echo "Starting Caddy..."
+    if command -v systemctl &>/dev/null; then
+        systemctl enable caddy
+        systemctl start caddy
+    elif command -v rc-service &>/dev/null; then
+        rc-update add caddy default
+        rc-service caddy start
+    fi
+}
+
+create_caddy_config() {
+    local domainName=""
+    read -p "Please enter your domain name (e.g., example.com):" domainName
+    
+    if [[ -z "$domainName" ]]; then
+        red "Domain name cannot be empty!"
+        return 1
+    fi
+
+    mkdir -p /usr/share/nginx/html
+    mkdir -p /etc/caddy
+
+    # download html
+    if curl -fsSL -o html.tar.gz https://cdn.jsdelivr.net/gh/smy116/RootCA@main/nginx/html.tar.gz; then
+        tar -zxvf html.tar.gz -C /usr/share/nginx/html
+        rm -rf html.tar.gz
+    else
+        yellow "Failed to download HTML package, skipping..."
+    fi
+
+    # write Caddyfile
+    cat > /etc/caddy/Caddyfile <<EOF
+{
+    admin off
+}
+
+http://$domainName {
+    redir https://{host}{uri}
+}
+
+$domainName {
+    root * /usr/share/nginx/html
+    file_server
+    encode gzip
+    header {
+        -Server
+    }
+}
+EOF
+}
+
 # Function to install Nginx for Ubuntu
 install_nginx_ubuntu() {
     pkg_update
@@ -539,6 +655,12 @@ case "${1:-}" in
             exit 1
         fi
         installNezha "$2"
+        exit 0
+        ;;
+    caddy)
+        check_dependencies
+        # 安装 Caddy
+        install_caddy
         exit 0
         ;;
     *)
