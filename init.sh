@@ -4,6 +4,7 @@ set -euo pipefail
 osRelease=""
 
 publicKey="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIETbOuKJEi5BUJXkCopshD/dfAKTOphKM9fqffCH5v+Y SMY"
+nezhaServer="status.smy.me:443"
 
 # SMY Root Certification Authority ECC
 read -r -d '' ECC_Content << 'EOF'
@@ -92,15 +93,8 @@ function  start_menu(){
 
         5 )
         #5. 运行哪吒监控 Agent 安装脚本
-            
-            read -p "Enter the Nezha Client Secret:" nezhaClientSecret
-            if [[ $nezhaClientSecret == "" ]]; then
-                yellow "Client Secret is empty！"
-                sleep 2s
-                start_menu
-            fi
-            curl -L https://raw.githubusercontent.com/nezhahq/scripts/main/agent/install.sh -o nezha.sh && chmod +x nezha.sh && env NZ_SERVER=status.smy.me:443 NZ_TLS=true NZ_DISABLE_COMMAND_EXECUTE=true NZ_DISABLE_NAT=true NZ_CLIENT_SECRET=$nezhaClientSecret ./nezha.sh
- 
+            installNezha
+            back_to_menu
         ;;
 
         6 )
@@ -114,8 +108,8 @@ function  start_menu(){
                     create_nginx_config
                     # Start and enable Nginx service
                     echo "Starting Nginx..."
-                    sudo systemctl start nginx
-                    sudo systemctl enable nginx
+                    systemctl start nginx
+                    systemctl enable nginx
                     ;;
                 debian)
                     # 对于Debian系统
@@ -123,8 +117,8 @@ function  start_menu(){
                     create_nginx_config
                     # Start and enable Nginx service
                     echo "Starting Nginx..."
-                    sudo systemctl start nginx
-                    sudo systemctl enable nginx
+                    systemctl start nginx
+                    systemctl enable nginx
                     ;;
                 centos)
                     # 对于CentOS系统
@@ -132,8 +126,8 @@ function  start_menu(){
                     create_nginx_config
                     # Start and enable Nginx service
                     echo "Starting Nginx..."
-                    sudo systemctl start nginx
-                    sudo systemctl enable nginx
+                    systemctl start nginx
+                    systemctl enable nginx
                     ;;
                 alpine)
                     # 对于Alpine系统
@@ -374,7 +368,7 @@ function changeSshPort(){
         # sshd
 
         sed -i "/^#Port .*/c\Port 54422" /etc/ssh/sshd_config
-        sudo sed -i "s/^Port .*/Port 54422/" /etc/ssh/sshd_config
+        sed -i "s/^Port .*/Port 54422/" /etc/ssh/sshd_config
         
         if [ "${1:-0}" = 1 ]; then
             systemctl restart sshd
@@ -419,13 +413,34 @@ function installCA(){
 
 }
 
+# 安装哪吒 Agent
+function installNezha(){
+    local nezhaClientSecret="${1:-}"
+
+    if [[ -z "$nezhaClientSecret" ]]; then
+        read -p "Enter the Nezha Client Secret:" nezhaClientSecret
+    fi
+
+    if [[ -z "$nezhaClientSecret" ]]; then
+        yellow "Client Secret is empty！"
+        return 1
+    fi
+
+    echo "Installing Nezha-agent v2..."
+    curl -L https://cdn.jsdelivr.net/gh/nezhahq/scripts@main/agent/install.sh -o nezha.sh
+    chmod +x nezha.sh
+    # 预制服务器地址及相关配置
+    env NZ_SERVER="$nezhaServer" NZ_TLS=true NZ_CLIENT_SECRET="$nezhaClientSecret" NZ_DISABLE_COMMAND_EXECUTE=true ./nezha.sh
+    rm -f nezha.sh
+}
+
 # Function to install Nginx for Ubuntu
 install_nginx_ubuntu() {
     pkg_update
     pkg_install curl gnupg2 ca-certificates lsb-release ubuntu-keyring
     echo "Adding Nginx repository for Ubuntu..."
-    wget -qO- https://nginx.org/keys/nginx_signing.key | gpg --dearmor | sudo tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
-    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/ubuntu/ $(lsb_release -cs) nginx" | sudo tee /etc/apt/sources.list.d/nginx.list
+    wget -qO- https://nginx.org/keys/nginx_signing.key | gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
+    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/ubuntu/ $(lsb_release -cs) nginx" | tee /etc/apt/sources.list.d/nginx.list
     pkg_update
     echo "Installing Nginx..."
     pkg_install nginx
@@ -436,8 +451,8 @@ install_nginx_debian() {
     pkg_update
     pkg_install curl gnupg2 ca-certificates lsb-release debian-archive-keyring
     echo "Adding Nginx repository for Debian..."
-    wget -qO- https://nginx.org/keys/nginx_signing.key | gpg --dearmor | sudo tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
-    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/debian/ $(lsb_release -cs) nginx" | sudo tee /etc/apt/sources.list.d/nginx.list
+    wget -qO- https://nginx.org/keys/nginx_signing.key | gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
+    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/debian/ $(lsb_release -cs) nginx" | tee /etc/apt/sources.list.d/nginx.list
     pkg_update
     echo "Installing Nginx..."
     pkg_install nginx
@@ -519,6 +534,17 @@ case "${1:-}" in
         fi
         echo "root:$2" | chpasswd
         setPublicKey
+        exit 0
+        ;;
+
+    nezha)
+        check_dependencies
+        # 安装哪吒 Agent
+        if [ -z "${2:-}" ]; then
+            yellow "Error: Nezha Client Secret is empty"
+            exit 1
+        fi
+        installNezha "$2"
         exit 0
         ;;
     *)
