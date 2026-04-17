@@ -1,7 +1,7 @@
 #!/bin/bash
+set -euo pipefail
 
 osRelease=""
-isChina=0
 
 publicKey="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIETbOuKJEi5BUJXkCopshD/dfAKTOphKM9fqffCH5v+Y SMY"
 
@@ -30,7 +30,7 @@ if [[ $(/usr/bin/id -u) -ne 0 ]]; then
 fi
 
 function  start_menu(){
-    clear
+    clear || true
 
     green " ================================================================="
     green " SMY One-click deployment script"
@@ -43,10 +43,9 @@ function  start_menu(){
     green " 3. Set SSH port to 54422"
     green " 4. Install SMY Root Certification Authority"
     green " 5. Run Nezha-agent script"
-    green " 6. Run BBR Cloudflare WARP script"
-    green " 7. Install Nginx Stable version"
-    green " 8. Run ACME Shell script: acme.sh"
-    green " 9. Reboot system"
+    green " 6. Install Nginx Stable version"
+    green " 7. Run ACME Shell script: acme.sh"
+    green " 8. Reboot system"
     green " 0. Exit script"
 
     echo
@@ -58,14 +57,8 @@ function  start_menu(){
             echo "设置北京时区........"
             setLinuxDateZone
 
-            read -p "Return to the Menu? Enter to return to the Menu by Default, Please enter [Y/n]:" isContinueInput
-            isContinueInput=${isContinueInput:-Y}
-
-            if [[ $isContinueInput == [Yy] ]]; then
-                start_menu
-            else 
-                exit 0
-            fi
+            setLinuxDateZone
+            back_to_menu
             
         ;;
 
@@ -79,42 +72,22 @@ function  start_menu(){
             setPublicKey
             green "Successful！, Please login to the server using SSH tool software!"
             
-            read -p "Return to the Menu? Enter to return to the Menu by Default, Please enter [Y/n]:" isContinueInput
-            isContinueInput=${isContinueInput:-Y}
-
-            if [[ $isContinueInput == [Yy] ]]; then
-                start_menu
-            else 
-                exit 0
-            fi
+            green "Successful！, Please login to the server using SSH tool software!"
+            back_to_menu
 
         ;;
 
         3 )
         #3. 修改 SSH 端口为 54422
             changeSshPort 0
-            read -p "Return to the Menu? Enter to return to the Menu by Default, Please enter [Y/n]:" isContinueInput
-            isContinueInput=${isContinueInput:-Y}
-
-            if [[ $isContinueInput == [Yy] ]]; then
-                start_menu
-            else 
-                exit 0
-            fi
+            back_to_menu
         ;;
 
         4 )
         #4. 安装 SMY Root Certification Authority
             installCA
             echo "Please manually reboot to make the changes take effect"
-            read -p "Return to the Menu? Enter to return to the Menu by Default, Please enter [Y/n]:" isContinueInput
-            isContinueInput=${isContinueInput:-Y}
-
-            if [[ $isContinueInput == [Yy] ]]; then
-                start_menu
-            else 
-                exit 0
-            fi
+            back_to_menu
         ;;
 
         5 )
@@ -131,18 +104,7 @@ function  start_menu(){
         ;;
 
         6 )
-        #6. 运行 Linux内核 BBR Cloudflare WARP安装脚本
-            getServerLocal
-            if [ $isChina -eq 1 ]; then
-                curl -O https://cdn.jsdelivr.net/gh/jinwyp/one_click_script@master/install_kernel.sh && chmod +x ./install_kernel.sh && ./install_kernel.sh
-            else
-                curl -O https://raw.githubusercontent.com/jinwyp/one_click_script/master/install_kernel.sh && chmod +x ./install_kernel.sh && ./install_kernel.sh
-            fi
-            
-        ;;
-
-        7 )
-        #7. 从 Nginx 源安装 Nginx Stable version
+        #6. 从 Nginx 源安装 Nginx Stable version
             
             # 根据不同的发行版，选择不同的安装方式
             case $osRelease in
@@ -187,21 +149,16 @@ function  start_menu(){
                     ;;
             esac
 
-            if [[ $isContinueInput == [Yy] ]]; then
-            isContinueInput=${isContinueInput:-Y}
-                start_menu
-            else 
-                exit 0
-            fi
+            back_to_menu
         ;;
 
-        8 )
-        #8. 运行 ACME Shell script: acme.sh
+        7 )
+        #7. 运行 ACME Shell script: acme.sh
             curl https://get.acme.sh | sh -s email=cdhcudgv@dasihcys.com
         ;;
 
-        9 )
-        #9. 重启系统
+        8 )
+        #8. 重启系统
             reboot
         ;;
 
@@ -210,7 +167,7 @@ function  start_menu(){
         ;;
 
         * )
-            clear
+            clear || true
             red "Please enter the option!"
             sleep 2s
             start_menu
@@ -238,42 +195,84 @@ function bold(){
 
 # 检测系统发行版代号，返回centos,debian,ubuntu,alpine,openwrt,other
 function getLinuxOSRelease(){
-    
-    if [[ -f /etc/redhat-release ]]; then
+    if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        case "$ID" in
+            ubuntu|debian|alpine|centos|openwrt)
+                osRelease="$ID"
+                ;;
+            raspbian)
+                osRelease="debian"
+                ;;
+            rhel|rocky|almalinux|fedora)
+                osRelease="centos"
+                ;;
+            *)
+                osRelease="other"
+                ;;
+        esac
+    elif [[ -f /etc/redhat-release ]]; then
         osRelease="centos"
-    elif cat /etc/issue | grep -Eqi "debian|raspbian"; then
+    elif grep -Eqi "debian|raspbian" /etc/issue 2>/dev/null; then
         osRelease="debian"
-    elif cat /etc/issue | grep -Eqi "ubuntu"; then
+    elif grep -Eqi "ubuntu" /etc/issue 2>/dev/null; then
         osRelease="ubuntu"
-    elif cat /etc/issue | grep -Eqi "centos|red hat|redhat"; then
+    elif grep -Eqi "centos|red hat|redhat" /etc/issue 2>/dev/null; then
         osRelease="centos"
-    elif cat /etc/issue | grep -Eqi "alpine"; then
-        osRelease="alpine"
-    elif cat /proc/version | grep -Eqi "debian|raspbian"; then
-        osRelease="debian"
-    elif cat /proc/version | grep -Eqi "ubuntu"; then
-        osRelease="ubuntu"
-    elif cat /proc/version | grep -Eqi "centos|red hat|redhat"; then
-        osRelease="centos"
-    elif cat /proc/version | grep -Eqi "alpine"; then
+    elif grep -Eqi "alpine" /etc/issue 2>/dev/null; then
         osRelease="alpine"
     elif command -v opkg >/dev/null 2>&1; then
         osRelease="openwrt"
     else
         osRelease="other"
     fi
-
 }
 
-# 判断服务器是否在中国
-function getServerLocal(){
-    if [[ $(curl -m 10 -s https://ipapi.co/json | grep 'China') != "" ]]; then
-        isChina=1
-    else
-        isChina=0
+# 辅助函数：包管理与环境检查
+function pkg_update(){
+    case $osRelease in
+        ubuntu|debian) apt-get update ;;
+        centos) yum makecache ;;
+        alpine) apk update ;;
+        openwrt) opkg update ;;
+    esac
+}
+
+function pkg_install(){
+    case $osRelease in
+        ubuntu|debian) apt-get install -y "$@" ;;
+        centos) yum install -y "$@" ;;
+        alpine) apk add "$@" ;;
+        openwrt) opkg install "$@" ;;
+    esac
+}
+
+function check_dependencies(){
+    echo "Checking dependencies........"
+    getLinuxOSRelease
+    local deps=("curl" "wget" "tar" "openssl" "ca-certificates")
+    
+    # 确保包管理器可用并安装基础依赖
+    for dep in "${deps[@]}"; do
+        if ! command -v "$dep" >/dev/null 2>&1; then
+            echo "Installing $dep..."
+            pkg_install "$dep" || true
+        fi
+    done
+}
+
+function back_to_menu(){
+    echo
+    read -p "Return to the Menu? Enter to return to the Menu by Default, Please enter [Y/n]:" isContinueInput
+    isContinueInput=${isContinueInput:-Y}
+
+    if [[ ${isContinueInput:-Y} == [Yy] ]]; then
+        start_menu
+    else 
+        exit 0
     fi
-
 }
+
 
 # 写入 SSH公钥
 function setPublicKey(){
@@ -356,7 +355,7 @@ function changeSshPort(){
 
         green "Successfully modified SSH port! The new port is 54422"
 
-        if [ $1 = 1 ]; then
+        if [ "${1:-0}" = 1 ]; then
             service dropbear restart
             echo "Restart SSH server"
         fi
@@ -366,7 +365,7 @@ function changeSshPort(){
         uci commit dropbear
         green "Successfully modified SSH port! The new port is 54422"
 
-        if [ $1 = 1 ]; then
+        if [ "${1:-0}" = 1 ]; then
             /etc/init.d/dropbear restart
             echo "Restart SSH server"
         fi
@@ -377,7 +376,7 @@ function changeSshPort(){
         sed -i "/^#Port .*/c\Port 54422" /etc/ssh/sshd_config
         sudo sed -i "s/^Port .*/Port 54422/" /etc/ssh/sshd_config
         
-        if [ $1 = 1 ]; then
+        if [ "${1:-0}" = 1 ]; then
             systemctl restart sshd
             echo "Restart SSH server"
         fi
@@ -396,12 +395,13 @@ function installCA(){
     case $osRelease in
         ubuntu|debian)
             # 对于Ubuntu和Debian系统
-            apt install -y ca-certificates
+            pkg_install ca-certificates
             echo "$ECC_Content" > "/usr/local/share/ca-certificates/SMY-Root-CA.crt"
             update-ca-certificates
             ;;
         centos)
             # 对于CentOS系统
+            pkg_install ca-certificates
             echo "$ECC_Content" > "/etc/pki/ca-trust/source/anchors/SMY-Root-CA.crt"
             update-ca-trust extract
             ;;
@@ -421,35 +421,31 @@ function installCA(){
 
 # Function to install Nginx for Ubuntu
 install_nginx_ubuntu() {
-    apt update
-    apt install -y curl gnupg2 ca-certificates lsb-release ubuntu-keyring
+    pkg_update
+    pkg_install curl gnupg2 ca-certificates lsb-release ubuntu-keyring
     echo "Adding Nginx repository for Ubuntu..."
-    wget https://nginx.org/keys/nginx_signing.key
-    sudo apt-key add nginx_signing.key
-    sudo sh -c "echo 'deb https://nginx.org/packages/ubuntu/ `lsb_release -cs` nginx' > /etc/apt/sources.list.d/nginx.list"
-    sudo sh -c "echo 'deb-src https://nginx.org/packages/ubuntu/ `lsb_release -cs` nginx' >> /etc/apt/sources.list.d/nginx.list"
-    sudo apt-get update
+    wget -qO- https://nginx.org/keys/nginx_signing.key | gpg --dearmor | sudo tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
+    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/ubuntu/ $(lsb_release -cs) nginx" | sudo tee /etc/apt/sources.list.d/nginx.list
+    pkg_update
     echo "Installing Nginx..."
-    sudo apt-get install -y nginx
+    pkg_install nginx
 }
 
 # Function to install Nginx for Debian
 install_nginx_debian() {
-    apt update
-    apt install -y curl gnupg2 ca-certificates lsb-release debian-archive-keyring
+    pkg_update
+    pkg_install curl gnupg2 ca-certificates lsb-release debian-archive-keyring
     echo "Adding Nginx repository for Debian..."
-    wget https://nginx.org/keys/nginx_signing.key
-    sudo apt-key add nginx_signing.key
-    sudo sh -c "echo 'deb https://nginx.org/packages/debian/ `lsb_release -cs` nginx' > /etc/apt/sources.list.d/nginx.list"
-    sudo sh -c "echo 'deb-src https://nginx.org/packages/debian/ `lsb_release -cs` nginx' >> /etc/apt/sources.list.d/nginx.list"
-    sudo apt-get update
+    wget -qO- https://nginx.org/keys/nginx_signing.key | gpg --dearmor | sudo tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
+    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/debian/ $(lsb_release -cs) nginx" | sudo tee /etc/apt/sources.list.d/nginx.list
+    pkg_update
     echo "Installing Nginx..."
-    sudo apt-get install -y nginx
+    pkg_install nginx
 }
 
 # Function to install Nginx for CentOS/RHEL
 install_nginx_centos() {
-    yum install yum-utils
+    pkg_install yum-utils
     echo "Adding Nginx repository for CentOS/RHEL..."
     cat > /etc/yum.repos.d/nginx.repo <<EOL
 [nginx-stable]
@@ -461,20 +457,20 @@ gpgkey=https://nginx.org/keys/nginx_signing.key
 module_hotfixes=true
 EOL
     echo "Installing Nginx..."
-    sudo yum install -y nginx
+    pkg_install nginx
 }
 
 
 # Function to install Nginx for alpine
 install_nginx_alpine() {
-    apk update
-    apk add openssl curl ca-certificates
+    pkg_update
+    pkg_install openssl curl ca-certificates
     ALPINE_VERSION=$(cat /etc/alpine-release | cut -d '.' -f 1-2)
     echo "http://nginx.org/packages/alpine/v${ALPINE_VERSION}/main" >> /etc/apk/repositories
-    curl -o /tmp/nginx_signing.rsa.pub https://nginx.org/keys/nginx_signing.rsa.pub
+    curl -fsSL -o /tmp/nginx_signing.rsa.pub https://nginx.org/keys/nginx_signing.rsa.pub
     mv /tmp/nginx_signing.rsa.pub /etc/apk/keys/
-    apk update
-    apk add nginx
+    pkg_update
+    pkg_install nginx
 }
 
 create_nginx_config() {
@@ -482,38 +478,42 @@ create_nginx_config() {
     mkdir -p /usr/share/nginx/html
 
     # download html
-    curl -o html.tar.gz  https://cdn.jsdelivr.net/gh/smy116/RootCA@main/nginx/html.tar.gz
-    tar -zxvf html.tar.gz -C /usr/share/nginx/html
-    rm -rf html.tar.gz
+    if curl -fsSL -o html.tar.gz https://cdn.jsdelivr.net/gh/smy116/RootCA@main/nginx/html.tar.gz; then
+        tar -zxvf html.tar.gz -C /usr/share/nginx/html
+        rm -rf html.tar.gz
+    else
+        yellow "Failed to download HTML package, skipping..."
+    fi
     
     # build dhparam.pem
-    openssl dhparam -dsaparam -out /etc/ssl/certs/dhparam.pem 4096
+    echo "Generating DHParam (2048-bit), this may take a minute..."
+    openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
 
     # write config
-    curl -o /etc/nginx/nginx.conf  https://cdn.jsdelivr.net/gh/smy116/RootCA@main/nginx/nginx.conf
+    curl -fsSL -o /etc/nginx/nginx.conf https://cdn.jsdelivr.net/gh/smy116/RootCA@main/nginx/nginx.conf || yellow "Failed to download nginx.conf"
 }
 
 # 接收到的参数，选择要执行的操作
-case $1 in
+case "${1:-}" in
     ca)
-        getLinuxOSRelease
+        check_dependencies
         # 安装 SMY Root Certification Authority
         installCA
         exit 0
         ;;
 
     sshport)
-        getLinuxOSRelease
+        check_dependencies
         # 修改 SSH 端口为 54422
         changeSshPort 1
         exit 0
         ;;
 
     root)
-        getLinuxOSRelease
+        check_dependencies
         # 配置SSH及Root账户
             
-        if [ ! $2 ]; then
+        if [ -z "${2:-}" ]; then
             yellow "Error:Password empty"
             exit 1
         fi
@@ -522,7 +522,7 @@ case $1 in
         exit 0
         ;;
     *)
-        getLinuxOSRelease
+        check_dependencies
         start_menu
         ;;
 esac
