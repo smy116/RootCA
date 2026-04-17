@@ -1,5 +1,4 @@
 #!/bin/bash
-set -euo pipefail
 
 osRelease=""
 
@@ -58,7 +57,6 @@ function  start_menu(){
             echo "设置北京时区........"
             setLinuxDateZone
 
-            setLinuxDateZone
             back_to_menu
             
         ;;
@@ -73,7 +71,6 @@ function  start_menu(){
             setPublicKey
             green "Successful！, Please login to the server using SSH tool software!"
             
-            green "Successful！, Please login to the server using SSH tool software!"
             back_to_menu
 
         ;;
