@@ -45,8 +45,7 @@ function  start_menu(){
     green " 4. Install SMY Root Certification Authority"
     green " 5. Run Nezha-agent script"
     green " 6. Install Nginx Stable version"
-    green " 7. Run ACME Shell script: acme.sh"
-    green " 8. Reboot system"
+    green " 7. Reboot system"
     green " 0. Exit script"
 
     echo
@@ -147,11 +146,6 @@ function  start_menu(){
         ;;
 
         7 )
-        #7. 运行 ACME Shell script: acme.sh
-            curl https://get.acme.sh | sh -s email=cdhcudgv@dasihcys.com
-        ;;
-
-        8 )
         #8. 重启系统
             reboot
         ;;
